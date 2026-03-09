@@ -17,6 +17,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  skip_provider_registration = true
 }
 
 output "confirmation" {
@@ -28,5 +30,3 @@ resource "azurerm_resource_group" "rg_test" {
   name     = "rg-terraform-Idrissa_Coulibaly"
   location = "eastus"
 }
-
-
