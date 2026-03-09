@@ -49,3 +49,45 @@ resource "azurerm_subnet" "subnet_vm" {
   address_prefixes     = ["10.10.1.0/24"]
 }
 
+# Interface réseau pour la VM
+resource "azurerm_network_interface" "nic_vm_demo" {
+  name                = "idrissa-coulibaly-nic"
+  location            = azurerm_resource_group.rg_test.location
+  resource_group_name = azurerm_resource_group.rg_test.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet_vm.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+# Machine Virtuelle (Ubuntu)
+resource "azurerm_linux_virtual_machine" "idrissa_vm_demo" {
+  name                = "idrissa-coulibaly-vm"
+  resource_group_name = azurerm_resource_group.rg_test.name
+  location            = azurerm_resource_group.rg_test.location
+  size                = "Standard_B1s"
+
+  admin_username = "azureuser"
+  admin_password = "Infected123!"
+
+  disable_password_authentication = false
+
+  network_interface_ids = [
+    azurerm_network_interface.nic_vm_demo.id
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
+}
+
