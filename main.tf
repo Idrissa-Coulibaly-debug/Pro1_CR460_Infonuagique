@@ -22,3 +22,11 @@ provider "azurerm" {
 output "confirmation" {
   value = "Terraform Cloud est correctement connecté à Azure et GitHub grâce au pipeline CI/CD."
 }
+
+# Déploiement de ressource groupe à partir de votre pipeline dans MS Azure
+resource "azurerm_resource_group" "rg_test" {
+  name     = "rg-terraform-Idrissa_Coulibaly"
+  location = "eastus"
+}
+
+
