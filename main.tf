@@ -28,7 +28,7 @@ output "confirmation" {
 # Déploiement de ressource groupe à partir de votre pipeline dans MS Azure
 resource "azurerm_resource_group" "rg_test" {
   name     = "rg-terraform-Idrissa_Coulibaly"
-  location = "eastus"
+  location = "canadaeast"
 }
 
 # Déploiement de Réseau Virtuel à partir de votre pipeline dans MS Azure
