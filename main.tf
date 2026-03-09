@@ -67,7 +67,7 @@ resource "azurerm_linux_virtual_machine" "idrissa_vm_demo" {
   name                = "idrissa-coulibaly-vm"
   resource_group_name = azurerm_resource_group.rg_test.name
   location            = azurerm_resource_group.rg_test.location
-  size                = "Standard_D2s_v3"
+  size                = "Standard_F1s"
 
   admin_username = "azureuser"
   admin_password = "Infected123!"
