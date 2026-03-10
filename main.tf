@@ -12,12 +12,15 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
 provider "azurerm" {
   features {}
-
   skip_provider_registration = true
 }
 
@@ -30,8 +33,6 @@ resource "azurerm_resource_group" "rg_test" {
   name     = "rg-terraform-Idrissa_Coulibaly"
   location = "canadaeast"
 }
-
-# Déploiement de Réseau Virtuel à partir de votre pipeline dans MS Azure
 
 # VNET
 resource "azurerm_virtual_network" "vnet" {
@@ -64,13 +65,13 @@ resource "azurerm_network_interface" "nic_vm_demo" {
 
 # Machine Virtuelle (Ubuntu)
 resource "azurerm_linux_virtual_machine" "idrissa_vm_demo" {
-  name                = "idrissa-coulibaly-vm"
-  resource_group_name = azurerm_resource_group.rg_test.name
-  location            = azurerm_resource_group.rg_test.location
-  size                = "Standard_D2s_v5"
+  name                            = "idrissa-coulibaly-vm"
+  resource_group_name             = azurerm_resource_group.rg_test.name
+  location                        = azurerm_resource_group.rg_test.location
+  size                            = "Standard_D2s_v5"
 
-  admin_username = "azureuser"
-  admin_password = "Infected123!"
+  admin_username                  = "azureuser"
+  admin_password                  = "Infected123!"
 
   disable_password_authentication = false
 
@@ -89,4 +90,50 @@ resource "azurerm_linux_virtual_machine" "idrissa_vm_demo" {
     sku       = "20_04-lts"
     version   = "latest"
   }
+}
+
+# Q10 - Déploiement d’un container Docker via pipeline dans MS Azure
+resource "random_string" "suffix" {
+  length  = 5
+  upper   = false
+  special = false
+}
+
+resource "azurerm_container_group" "nginx_demo" {
+  name                = "coulibaly-idrissa-nginx-${random_string.suffix.result}"
+  location            = azurerm_resource_group.rg_test.location
+  resource_group_name = azurerm_resource_group.rg_test.name
+  os_type             = "Linux"
+  ip_address_type     = "Public"
+  dns_name_label      = "coulibaly-idrissa-hello-${random_string.suffix.result}"
+  restart_policy      = "Always"
+
+  container {
+    name   = "helloworld"
+    image  = "mcr.microsoft.com/azuredocs/aci-helloworld:latest"
+    cpu    = "0.5"
+    memory = "1.0"
+
+    ports {
+      port     = 80
+      protocol = "TCP"
+    }
+  }
+
+  tags = {
+    environment = "lab"
+    owner       = "coulibaly-idrissa"
+    question    = "Q10"
+  }
+}
+
+# Outputs utiles
+output "aci_fqdn" {
+  value       = azurerm_container_group.nginx_demo.fqdn
+  description = "FQDN du conteneur ACI - Ouvrez http://<cette-valeur> dans votre navigateur après apply"
+}
+
+output "aci_ip" {
+  value       = azurerm_container_group.nginx_demo.ip_address
+  description = "Adresse IP publique du conteneur (si FQDN ne résout pas immédiatement)"
 }
